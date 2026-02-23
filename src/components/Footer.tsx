@@ -1,20 +1,36 @@
+"use client";
+
+import Image from "next/image";
 import { Instagram, Facebook, Mail, Phone } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function Footer() {
+  const { t } = useLanguage();
+
+  const navLinks = [
+    [t.nav.villa, "#villa"],
+    [t.nav.amenities, "#amenities"],
+    [t.nav.gallery, "#gallery"],
+    [t.nav.location, "#location"],
+    [t.nav.book, "#booking"],
+  ];
+
   return (
     <footer className="bg-stone-900 text-white">
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           <div>
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-8 h-8 rounded-full bg-terracotta-600 flex items-center justify-center">
-                <span className="text-white font-serif font-bold text-sm">VC</span>
-              </div>
-              <span className="font-serif text-xl font-semibold">Villas Candita</span>
+            <div className="flex items-center mb-6">
+              <Image
+                src="/images/candita_logo.JPG"
+                alt="Villas Candita"
+                width={80}
+                height={80}
+                className="rounded-full object-cover"
+              />
             </div>
             <p className="text-white/60 text-sm leading-relaxed mb-6">
-              Tu refugio privado en Mérida, Yucatán. Elegancia colonial,
-              naturaleza tropical y comodidades de lujo en un solo lugar.
+              {t.footer.description}
             </p>
             <div className="flex gap-4">
               <a
@@ -39,15 +55,9 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-white mb-6">Navegación</h4>
+            <h4 className="font-semibold text-white mb-6">{t.footer.navigation}</h4>
             <ul className="space-y-3 text-sm">
-              {[
-                ["La Villa", "#villa"],
-                ["Comodidades", "#amenities"],
-                ["Galería", "#gallery"],
-                ["Ubicación", "#location"],
-                ["Reservar", "#booking"],
-              ].map(([label, href]) => (
+              {navLinks.map(([label, href]) => (
                 <li key={label}>
                   <a
                     href={href}
@@ -61,7 +71,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-white mb-6">Contacto</h4>
+            <h4 className="font-semibold text-white mb-6">{t.footer.contact}</h4>
             <ul className="space-y-4 text-sm">
               <li>
                 <a
@@ -89,10 +99,10 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/10 mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-white/40">
-          <p>© {new Date().getFullYear()} Villas Candita. Todos los derechos reservados.</p>
+          <p>© {new Date().getFullYear()} Villas Candita. {t.footer.rights}</p>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-white/70 transition-colors">Aviso de privacidad</a>
-            <a href="#" className="hover:text-white/70 transition-colors">Términos y condiciones</a>
+            <a href="#" className="hover:text-white/70 transition-colors">{t.footer.privacy}</a>
+            <a href="#" className="hover:text-white/70 transition-colors">{t.footer.terms}</a>
           </div>
         </div>
       </div>

@@ -3,70 +3,46 @@
 import { useState } from "react";
 import Image from "next/image";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
-const galleryImages = [
-  {
-    src: "/images/Candita/PATIO3.JPG",
-    alt: "Patio colonial",
-    span: "col-span-2 row-span-2",
-  },
-  {
-    src: "/images/Candita/IMG_3191.jpeg",
-    alt: "Áreas comunes",
-    span: "",
-  },
-  {
-    src: "/images/Candita/IMG_3192.jpeg",
-    alt: "Jardín tropical",
-    span: "",
-  },
-  {
-    src: "/images/Candita/IMG_3214.jpeg",
-    alt: "Espacios interiores",
-    span: "",
-  },
-  {
-    src: "/images/Candita/P1012829.JPG",
-    alt: "Fachada colonial",
-    span: "",
-  },
-  {
-    src: "/images/Candita/PATIO5.jpeg",
-    alt: "Terraza y jardín",
-    span: "col-span-2",
-  },
-  {
-    src: "/images/Candita/P1012840.JPG",
-    alt: "Detalles arquitectónicos",
-    span: "",
-  },
-  {
-    src: "/images/Candita/IMG_3201.jpeg",
-    alt: "Rincones de la villa",
-    span: "",
-  },
+const galleryImageSrcs = [
+  { src: "/images/Candita/PATIO3.JPG", span: "col-span-2 row-span-2" },
+  { src: "/images/Candita/IMG_3191.jpeg", span: "" },
+  { src: "/images/Candita/IMG_3192.jpeg", span: "" },
+  { src: "/images/Candita/IMG_3214.jpeg", span: "" },
+  { src: "/images/Candita/P1012829.JPG", span: "" },
+  { src: "/images/Candita/PATIO5.jpeg", span: "col-span-2" },
+  { src: "/images/Candita/P1012840.JPG", span: "" },
+  { src: "/images/Candita/IMG_3201.jpeg", span: "" },
 ];
 
 export default function Gallery() {
+  const { t } = useLanguage();
   const [lightbox, setLightbox] = useState<number | null>(null);
 
+  const galleryImages = galleryImageSrcs.map((img, i) => ({
+    ...img,
+    alt: t.gallery.alts[i] ?? `Photo ${i + 1}`,
+  }));
+
   const prev = () =>
-    setLightbox((i) => (i !== null ? (i - 1 + galleryImages.length) % galleryImages.length : null));
+    setLightbox((i) =>
+      i !== null ? (i - 1 + galleryImages.length) % galleryImages.length : null
+    );
   const next = () =>
-    setLightbox((i) => (i !== null ? (i + 1) % galleryImages.length : null));
+    setLightbox((i) =>
+      i !== null ? (i + 1) % galleryImages.length : null
+    );
 
   return (
     <section id="gallery" className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
           <p className="text-terracotta-600 text-sm font-medium tracking-[0.25em] uppercase mb-4">
-            Galería
+            {t.gallery.tag}
           </p>
-          <h2 className="section-title">Cada espacio, una experiencia</h2>
-          <p className="section-subtitle max-w-xl mx-auto">
-            Descubre los rincones que harán de tu estancia un recuerdo
-            imborrable.
-          </p>
+          <h2 className="section-title">{t.gallery.title}</h2>
+          <p className="section-subtitle max-w-xl mx-auto">{t.gallery.subtitle}</p>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[200px]">
@@ -91,10 +67,8 @@ export default function Gallery() {
             </div>
           ))}
         </div>
-
       </div>
 
-      {/* Lightbox */}
       {lightbox !== null && (
         <div
           className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
@@ -103,14 +77,14 @@ export default function Gallery() {
           <button
             className="absolute top-6 right-6 text-white/80 hover:text-white p-2"
             onClick={() => setLightbox(null)}
-            aria-label="Cerrar"
+            aria-label={t.gallery.close}
           >
             <X size={28} />
           </button>
           <button
             className="absolute left-4 md:left-8 text-white/80 hover:text-white p-2"
             onClick={(e) => { e.stopPropagation(); prev(); }}
-            aria-label="Anterior"
+            aria-label={t.gallery.prev}
           >
             <ChevronLeft size={36} />
           </button>
@@ -129,7 +103,7 @@ export default function Gallery() {
           <button
             className="absolute right-4 md:right-8 text-white/80 hover:text-white p-2"
             onClick={(e) => { e.stopPropagation(); next(); }}
-            aria-label="Siguiente"
+            aria-label={t.gallery.next}
           >
             <ChevronRight size={36} />
           </button>

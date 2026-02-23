@@ -11,7 +11,7 @@ const OPENPAY_BASE_URL = OPENPAY_SANDBOX
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { tokenId, amount, description, deviceSessionId, customer, booking } = body;
+    const { tokenId, amount, description, deviceSessionId, customer } = body;
 
     if (!tokenId || !amount || !customer?.email) {
       return NextResponse.json(
