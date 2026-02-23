@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-stone-50 text-stone-800;
+    font-family: 'Georgia', serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-terracotta-600 hover:bg-terracotta-700 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg;
+  }
+
+  .btn-outline {
+    @apply border-2 border-terracotta-600 text-terracotta-600 hover:bg-terracotta-600 hover:text-white font-semibold py-3 px-8 rounded-lg transition-all duration-200;
+  }
+
+  .section-title {
+    @apply text-3xl md:text-4xl font-serif text-stone-800 mb-4;
+  }
+
+  .section-subtitle {
+    @apply text-stone-500 text-lg mb-10;
+  }
+}
+
+/* React Date Range custom styles */
+.rdrCalendarWrapper {
+  font-family: 'Georgia', serif !important;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.rdrDateRangePickerWrapper {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.rdrDayStartPreview,
+.rdrDayInPreview,
+.rdrDayEndPreview {
+  border-color: #ce4c23 !important;
+}
+
+.rdrStartEdge,
+.rdrEndEdge,
+.rdrInRange {
+  background-color: #ce4c23 !important;
+}
+
+.rdrDayStartPreview,
+.rdrDayEndPreview,
+.rdrDayInPreview {
+  background: rgba(206, 76, 35, 0.1) !important;
+}
+
+.rdrSelected {
+  background-color: #ce4c23 !important;
+}
+
+.rdrDayToday .rdrDayNumber span:after {
+  background: #ce4c23 !important;
+}
+
+.rdrMonthAndYearPickers select {
+  color: #1c1917;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
