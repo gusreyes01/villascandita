@@ -3,7 +3,6 @@
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
-import { es } from "date-fns/locale";
 import {
   CheckCircle,
   CalendarDays,
@@ -14,10 +13,13 @@ import {
   Clock,
   Download,
   Home,
+  Lock,
 } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
-export default function ConfirmationPage() {
+export default function ConfirmationContent() {
   const searchParams = useSearchParams();
+  const { t, dateLocale } = useLanguage();
 
   const orderId = searchParams.get("orderId") ?? "VC-000000";
   const checkIn = searchParams.get("checkIn") ?? "";
@@ -25,12 +27,11 @@ export default function ConfirmationPage() {
   const nights = parseInt(searchParams.get("nights") ?? "0");
   const guests = parseInt(searchParams.get("guests") ?? "1");
   const total = parseInt(searchParams.get("total") ?? "0");
-  const guestName = searchParams.get("name") ?? "Huésped";
+  const guestName = searchParams.get("name") ?? (t.confirmationPage.thanks === "Thank you" ? "Guest" : "Huésped");
   const guestEmail = searchParams.get("email") ?? "";
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-stone-50 to-sand-50">
-      {/* Header */}
       <header className="bg-white border-b border-stone-100 shadow-sm">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center gap-3">
           <div className="w-7 h-7 rounded-full bg-terracotta-600 flex items-center justify-center">
@@ -47,22 +48,23 @@ export default function ConfirmationPage() {
             <CheckCircle className="text-jungle-600" size={44} />
           </div>
           <h1 className="text-4xl md:text-5xl font-serif text-stone-800 mb-4">
-            ¡Reserva confirmada!
+            {t.confirmationPage.confirmed}
           </h1>
           <p className="text-stone-500 text-lg max-w-lg mx-auto">
-            Gracias, <strong className="text-stone-700">{guestName}</strong>. Tu reserva en
-            Villas Candita ha sido procesada exitosamente.
+            {t.confirmationPage.thanks},{" "}
+            <strong className="text-stone-700">{guestName}</strong>.{" "}
+            {t.confirmationPage.bookingProcessed}
           </p>
           <div className="mt-4 inline-flex items-center gap-2 bg-stone-100 px-4 py-2 rounded-full">
-            <span className="text-stone-500 text-sm">Número de reserva:</span>
+            <span className="text-stone-500 text-sm">{t.confirmationPage.bookingNumber}</span>
             <span className="font-mono font-bold text-stone-800 text-sm">{orderId}</span>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {/* Booking details */}
+          {/* Stay details */}
           <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-6">
-            <h2 className="font-serif text-xl text-stone-800 mb-5">Detalles de tu estancia</h2>
+            <h2 className="font-serif text-xl text-stone-800 mb-5">{t.confirmationPage.stayDetails}</h2>
 
             <div className="space-y-5">
               <div className="flex items-start gap-4">
@@ -70,12 +72,16 @@ export default function ConfirmationPage() {
                   <CalendarDays className="text-terracotta-600" size={18} />
                 </div>
                 <div>
-                  <p className="text-xs text-stone-500 uppercase tracking-wide mb-1">Check-in</p>
+                  <p className="text-xs text-stone-500 uppercase tracking-wide mb-1">
+                    {t.confirmationPage.checkIn}
+                  </p>
                   <p className="font-semibold text-stone-800">
-                    {checkIn && format(parseISO(checkIn), "EEEE, d 'de' MMMM 'de' yyyy", { locale: es })}
+                    {checkIn &&
+                      format(parseISO(checkIn), "EEEE, d 'de' MMMM 'de' yyyy", { locale: dateLocale })}
                   </p>
                   <p className="text-stone-500 text-sm flex items-center gap-1 mt-1">
-                    <Clock size={12} />A partir de las 3:00 PM
+                    <Clock size={12} />
+                    {t.confirmationPage.fromTime}
                   </p>
                 </div>
               </div>
@@ -85,12 +91,16 @@ export default function ConfirmationPage() {
                   <CalendarDays className="text-terracotta-600" size={18} />
                 </div>
                 <div>
-                  <p className="text-xs text-stone-500 uppercase tracking-wide mb-1">Check-out</p>
+                  <p className="text-xs text-stone-500 uppercase tracking-wide mb-1">
+                    {t.confirmationPage.checkOut}
+                  </p>
                   <p className="font-semibold text-stone-800">
-                    {checkOut && format(parseISO(checkOut), "EEEE, d 'de' MMMM 'de' yyyy", { locale: es })}
+                    {checkOut &&
+                      format(parseISO(checkOut), "EEEE, d 'de' MMMM 'de' yyyy", { locale: dateLocale })}
                   </p>
                   <p className="text-stone-500 text-sm flex items-center gap-1 mt-1">
-                    <Clock size={12} />Antes de las 12:00 PM
+                    <Clock size={12} />
+                    {t.confirmationPage.beforeTime}
                   </p>
                 </div>
               </div>
@@ -100,10 +110,12 @@ export default function ConfirmationPage() {
                   <Users className="text-terracotta-600" size={18} />
                 </div>
                 <div>
-                  <p className="text-xs text-stone-500 uppercase tracking-wide mb-1">Huéspedes</p>
+                  <p className="text-xs text-stone-500 uppercase tracking-wide mb-1">
+                    {t.confirmationPage.guestsLabel}
+                  </p>
                   <p className="font-semibold text-stone-800">
-                    {guests} {guests === 1 ? "persona" : "personas"} · {nights}{" "}
-                    {nights === 1 ? "noche" : "noches"}
+                    {guests} {guests === 1 ? t.confirmationPage.person : t.confirmationPage.persons} ·{" "}
+                    {nights} {nights === 1 ? t.confirmationPage.night : t.confirmationPage.nights}
                   </p>
                 </div>
               </div>
@@ -113,7 +125,9 @@ export default function ConfirmationPage() {
                   <MapPin className="text-terracotta-600" size={18} />
                 </div>
                 <div>
-                  <p className="text-xs text-stone-500 uppercase tracking-wide mb-1">Propiedad</p>
+                  <p className="text-xs text-stone-500 uppercase tracking-wide mb-1">
+                    {t.confirmationPage.property}
+                  </p>
                   <p className="font-semibold text-stone-800">Villas Candita</p>
                   <p className="text-stone-500 text-sm">Mérida, Yucatán, México</p>
                 </div>
@@ -121,43 +135,38 @@ export default function ConfirmationPage() {
             </div>
           </div>
 
-          {/* Payment summary & next steps */}
+          {/* Right column */}
           <div className="space-y-6">
-            {/* Payment */}
             <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-6">
-              <h2 className="font-serif text-xl text-stone-800 mb-4">Pago realizado</h2>
+              <h2 className="font-serif text-xl text-stone-800 mb-4">{t.confirmationPage.paymentDone}</h2>
               <div className="flex items-center justify-between py-3 border-b border-stone-50">
-                <span className="text-stone-600 text-sm">Total pagado</span>
+                <span className="text-stone-600 text-sm">{t.confirmationPage.totalPaid}</span>
                 <span className="font-bold text-xl text-terracotta-600">
                   ${total.toLocaleString("es-MX")}{" "}
                   <span className="text-sm font-normal text-stone-400">MXN</span>
                 </span>
               </div>
               <div className="flex items-center gap-2 mt-3 text-xs text-stone-400">
-                <CheckCircle size={12} className="text-jungle-500" />
-                <span>Procesado de forma segura con Openpay</span>
+                <Lock size={12} className="text-jungle-500" />
+                <span>{t.confirmationPage.securePayment}</span>
               </div>
             </div>
 
-            {/* Confirmation email */}
             <div className="bg-jungle-50 border border-jungle-100 rounded-2xl p-6">
               <div className="flex items-start gap-3">
                 <Mail className="text-jungle-600 flex-shrink-0 mt-0.5" size={18} />
                 <div>
-                  <h3 className="font-semibold text-stone-800 mb-1">
-                    Revisa tu correo electrónico
-                  </h3>
+                  <h3 className="font-semibold text-stone-800 mb-1">{t.confirmationPage.checkEmail}</h3>
                   <p className="text-stone-600 text-sm leading-relaxed">
-                    Hemos enviado la confirmación de tu reserva y los detalles de acceso a{" "}
+                    {t.confirmationPage.emailSent}{" "}
                     <strong>{guestEmail}</strong>.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Contact */}
             <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-6">
-              <h3 className="font-semibold text-stone-800 mb-4">¿Necesitas ayuda?</h3>
+              <h3 className="font-semibold text-stone-800 mb-4">{t.confirmationPage.needHelp}</h3>
               <div className="space-y-3">
                 <a
                   href="mailto:hola@villascandita.com"
@@ -178,31 +187,13 @@ export default function ConfirmationPage() {
           </div>
         </div>
 
-        {/* What to expect */}
+        {/* What's next */}
         <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-8 mb-8">
-          <h2 className="font-serif text-xl text-stone-800 mb-6">¿Qué sigue?</h2>
+          <h2 className="font-serif text-xl text-stone-800 mb-6">{t.confirmationPage.whatNext}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {[
-              {
-                step: "01",
-                title: "Confirmación por correo",
-                desc: "Recibirás un correo con todos los detalles de tu reserva y las instrucciones de acceso.",
-              },
-              {
-                step: "02",
-                title: "Coordina tu llegada",
-                desc: "48 horas antes de tu llegada, te contactaremos para coordinar el check-in y entregarte el código de acceso.",
-              },
-              {
-                step: "03",
-                title: "¡Disfruta Mérida!",
-                desc: "Llega a partir de las 3 PM, relájate en tu villa privada y descubre la magia de Yucatán.",
-              },
-            ].map(({ step, title, desc }) => (
+            {t.confirmationPage.nextSteps.map(({ step, title, desc }) => (
               <div key={step} className="flex gap-4">
-                <div className="text-3xl font-serif text-stone-200 font-bold leading-none">
-                  {step}
-                </div>
+                <div className="text-3xl font-serif text-stone-200 font-bold leading-none">{step}</div>
                 <div>
                   <h3 className="font-semibold text-stone-800 mb-2">{title}</h3>
                   <p className="text-stone-500 text-sm leading-relaxed">{desc}</p>
@@ -212,27 +203,26 @@ export default function ConfirmationPage() {
           </div>
         </div>
 
-        {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href="/"
             className="inline-flex items-center justify-center gap-2 bg-terracotta-600 hover:bg-terracotta-700 text-white font-semibold py-3 px-8 rounded-xl transition-colors shadow-md hover:shadow-lg"
           >
             <Home size={16} />
-            Volver al inicio
+            {t.confirmationPage.backHome}
           </Link>
           <button
             onClick={() => window.print()}
             className="inline-flex items-center justify-center gap-2 border-2 border-stone-200 text-stone-600 hover:border-stone-400 font-semibold py-3 px-8 rounded-xl transition-colors"
           >
             <Download size={16} />
-            Imprimir confirmación
+            {t.confirmationPage.print}
           </button>
         </div>
       </main>
 
       <footer className="text-center py-8 text-stone-400 text-sm border-t border-stone-100 mt-8">
-        © {new Date().getFullYear()} Villas Candita · Mérida, Yucatán, México
+        © {new Date().getFullYear()} Villas Candita · {t.confirmationPage.rights}
       </footer>
     </div>
   );

@@ -64,7 +64,7 @@ const roomsData: RoomData[] = [
 ];
 
 function RoomCard({ room }: { room: RoomData }) {
-  const { t, lang } = useLanguage();
+  const { t } = useLanguage();
   const [current, setCurrent] = useState(0);
 
   const displayName = `${t.rooms.room} ${room.nameKey}`;

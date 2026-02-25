@@ -8,9 +8,8 @@ import {
   useCallback,
   ReactNode,
 } from "react";
-import { es as dateFnsEs } from "date-fns/locale";
-import { enUS as dateFnsEn } from "date-fns/locale";
-import { Locale } from "date-fns";
+import { es as dateFnsEs, enUS as dateFnsEn } from "date-fns/locale";
+import type { Locale } from "date-fns";
 import { Lang, Translations, translations } from "@/i18n/translations";
 
 interface LanguageContextValue {
