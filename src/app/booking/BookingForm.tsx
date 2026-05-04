@@ -57,6 +57,7 @@ export default function BookingForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [openpayReady, setOpenpayReady] = useState(false);
+  const [deviceSessionId, setDeviceSessionId] = useState<string>("");
 
   const [guestForm, setGuestForm] = useState<GuestForm>({
     firstName: "",
@@ -89,6 +90,8 @@ export default function BookingForm() {
         window.OpenPay.setId(process.env.NEXT_PUBLIC_OPENPAY_MERCHANT_ID ?? "");
         window.OpenPay.setApiKey(process.env.NEXT_PUBLIC_OPENPAY_PUBLIC_KEY ?? "");
         window.OpenPay.setSandboxMode(process.env.NEXT_PUBLIC_OPENPAY_SANDBOX !== "false");
+        const sessionId = window.OpenPay.deviceData.setup("payment-form", "device-session-id");
+        setDeviceSessionId(sessionId);
         setOpenpayReady(true);
       }
     };
@@ -143,7 +146,7 @@ export default function BookingForm() {
               tokenId,
               amount: total,
               description: `Villas Candita · ${roomName} — ${checkIn} to ${checkOut} (${nights} nights)`,
-              deviceSessionId: window.OpenPay.deviceData.setup("payment-form", "device-session-id"),
+              deviceSessionId,
               customer: {
                 name: guestForm.firstName,
                 lastName: guestForm.lastName,

@@ -20,15 +20,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create charge via Openpay REST API
     const credentials = Buffer.from(`${OPENPAY_PRIVATE_KEY}:`).toString("base64");
+    const orderId = `VC-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
     const chargePayload = {
       source_id: tokenId,
       method: "card",
-      amount: amount / 100, // Openpay uses pesos, not centavos for MXN
+      amount: Number(amount),
       currency: "MXN",
       description,
+      order_id: orderId,
       device_session_id: deviceSessionId,
       customer: {
         name: customer.name,
