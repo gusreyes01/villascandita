@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { Instagram, Facebook, Mail, Phone } from "lucide-react";
+import Link from "next/link";
+import { Instagram, Facebook, Mail, Phone, MapPin } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function Footer() {
@@ -75,24 +76,31 @@ export default function Footer() {
             <ul className="space-y-4 text-sm">
               <li>
                 <a
-                  href="mailto:hola@villascandita.com"
+                  href="mailto:villascandita@yahoo.com"
                   className="flex items-center gap-3 text-white/60 hover:text-terracotta-400 transition-colors"
                 >
                   <Mail size={15} />
-                  hola@villascandita.com
+                  villascandita@yahoo.com
                 </a>
               </li>
               <li>
                 <a
-                  href="tel:+529991234567"
+                  href="tel:+528182533561"
                   className="flex items-center gap-3 text-white/60 hover:text-terracotta-400 transition-colors"
                 >
                   <Phone size={15} />
-                  +52 999 123 4567
+                  +52 818 253 3561
                 </a>
               </li>
-              <li className="text-white/60">
-                <p>Mérida, Yucatán, México</p>
+              <li>
+                <div className="flex items-start gap-3 text-white/60">
+                  <MapPin size={15} className="mt-0.5 shrink-0" />
+                  <p>
+                    Calle 52 #427 interior b<br />
+                    C.P. 97000<br />
+                    Merida, Yucatan, Mexico
+                  </p>
+                </div>
               </li>
             </ul>
           </div>
@@ -101,7 +109,7 @@ export default function Footer() {
         <div className="border-t border-white/10 mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-white/40">
           <p>© {new Date().getFullYear()} Villas Candita. {t.footer.rights}</p>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-white/70 transition-colors">{t.footer.privacy}</a>
+            <Link href="/aviso-de-privacidad" className="hover:text-white/70 transition-colors">{t.footer.privacy}</Link>
             <a href="#" className="hover:text-white/70 transition-colors">{t.footer.terms}</a>
           </div>
         </div>

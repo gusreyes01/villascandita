@@ -190,6 +190,78 @@ export const esTranslations = {
     rights: "Todos los derechos reservados.",
   },
 
+  privacyPage: {
+    title: "Aviso de privacidad",
+    lastUpdated: "Última actualización: mayo 2026",
+    backHome: "Volver al inicio",
+    intro:
+      "En cumplimiento con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP) y su Reglamento, Villas Candita pone a su disposición el presente Aviso de Privacidad.",
+    responsibleTitle: "1. Identidad del responsable",
+    responsibleText:
+      "Villas Candita, con domicilio en Calle 52 #427 interior b, C.P. 97000, Mérida, Yucatán, México, es responsable del tratamiento de sus datos personales. Para cualquier asunto relacionado con el presente aviso de privacidad, puede contactarnos a través del correo electrónico: villascandita@yahoo.com o al teléfono +52 818 253 3561.",
+    dataCollectedTitle: "2. Datos personales que se recaban",
+    dataCollectedText:
+      "Para las finalidades señaladas en el presente aviso de privacidad, podemos recabar los siguientes datos personales:",
+    dataCollectedItems: [
+      "Nombre completo",
+      "Correo electrónico",
+      "Número de teléfono",
+      "Datos de pago (número de tarjeta, nombre del titular, fecha de vencimiento y CVV), procesados de forma segura a través de Openpay",
+      "Solicitudes especiales relacionadas con su estancia",
+    ],
+    purposeTitle: "3. Finalidades del tratamiento",
+    purposeText:
+      "Sus datos personales serán utilizados para las siguientes finalidades:",
+    purposePrimary: "Finalidades primarias (necesarias):",
+    purposePrimaryItems: [
+      "Procesar y confirmar su reservación",
+      "Gestionar el cobro de los servicios contratados",
+      "Proporcionarle información sobre su estancia (instrucciones de acceso, check-in, check-out)",
+      "Atender sus solicitudes, dudas o comentarios",
+      "Cumplir con obligaciones fiscales y legales aplicables",
+    ],
+    purposeSecondary: "Finalidades secundarias (no necesarias):",
+    purposeSecondaryItems: [
+      "Enviarle información promocional sobre nuestros servicios",
+      "Realizar encuestas de satisfacción",
+    ],
+    purposeSecondaryNote:
+      "Si usted no desea que sus datos sean tratados para finalidades secundarias, puede comunicarlo al correo electrónico: villascandita@yahoo.com.",
+    transferTitle: "4. Transferencias de datos",
+    transferText:
+      "Sus datos personales pueden ser transferidos a los siguientes terceros:",
+    transferItems: [
+      "Openpay: para el procesamiento seguro de pagos con tarjeta de crédito o débito",
+      "Autoridades competentes: cuando sea requerido por ley o por orden de autoridad",
+    ],
+    arcoTitle: "5. Derechos ARCO",
+    arcoText:
+      "Usted tiene derecho a Acceder, Rectificar, Cancelar u Oponerse (derechos ARCO) al tratamiento de sus datos personales. Para ejercer cualquiera de estos derechos, envíe su solicitud al correo electrónico: villascandita@yahoo.com, indicando:",
+    arcoItems: [
+      "Nombre completo del titular",
+      "Descripción clara de los datos sobre los que desea ejercer algún derecho",
+      "Cualquier documento que facilite la localización de sus datos",
+    ],
+    arcoResponse:
+      "Responderemos su solicitud en un plazo máximo de 20 días hábiles contados a partir de la fecha de recepción.",
+    cookiesTitle: "6. Uso de cookies y tecnologías de rastreo",
+    cookiesText:
+      "Nuestro sitio web puede utilizar cookies y otras tecnologías de rastreo para mejorar su experiencia de navegación, analizar el tráfico del sitio y personalizar el contenido. Usted puede deshabilitar las cookies a través de la configuración de su navegador.",
+    changesTitle: "7. Cambios al aviso de privacidad",
+    changesText:
+      "Nos reservamos el derecho de modificar el presente aviso de privacidad en cualquier momento. Las modificaciones estarán disponibles en esta misma página web. Le recomendamos revisarla periódicamente.",
+    consentTitle: "8. Consentimiento",
+    consentText:
+      "Al proporcionar sus datos personales a través de nuestro sitio web o al realizar una reservación, usted manifiesta su consentimiento para el tratamiento de sus datos conforme a lo establecido en el presente aviso de privacidad.",
+    contactTitle: "Contacto",
+    contactText:
+      "Si tiene alguna duda o comentario sobre este aviso de privacidad, puede contactarnos en:",
+    contactEmail: "villascandita@yahoo.com",
+    contactPhone: "+52 818 253 3561",
+    contactAddress: "Calle 52 #427 interior b, C.P. 97000",
+    contactLocation: "Mérida, Yucatán, México",
+  },
+
   bookingPage: {
     loading: "Cargando reserva...",
     back: "Volver",
@@ -477,6 +549,78 @@ export const enTranslations: Translations = {
     privacy: "Privacy policy",
     terms: "Terms & conditions",
     rights: "All rights reserved.",
+  },
+
+  privacyPage: {
+    title: "Privacy policy",
+    lastUpdated: "Last updated: May 2026",
+    backHome: "Back to home",
+    intro:
+      "In compliance with Mexico's Federal Law on the Protection of Personal Data Held by Private Parties (LFPDPPP) and its Regulations, Villas Candita provides you with this Privacy Policy.",
+    responsibleTitle: "1. Data controller",
+    responsibleText:
+      "Villas Candita, located at Calle 52 #427 interior b, C.P. 97000, Mérida, Yucatán, Mexico, is responsible for the processing of your personal data. For any matter related to this privacy policy, you may contact us at: villascandita@yahoo.com or by phone at +52 818 253 3561.",
+    dataCollectedTitle: "2. Personal data collected",
+    dataCollectedText:
+      "For the purposes stated in this privacy policy, we may collect the following personal data:",
+    dataCollectedItems: [
+      "Full name",
+      "Email address",
+      "Phone number",
+      "Payment information (card number, cardholder name, expiration date, and CVV), securely processed through Openpay",
+      "Special requests related to your stay",
+    ],
+    purposeTitle: "3. Purpose of data processing",
+    purposeText:
+      "Your personal data will be used for the following purposes:",
+    purposePrimary: "Primary purposes (necessary):",
+    purposePrimaryItems: [
+      "Process and confirm your reservation",
+      "Manage payment for the contracted services",
+      "Provide you with information about your stay (access instructions, check-in, check-out)",
+      "Respond to your inquiries, questions, or comments",
+      "Comply with applicable tax and legal obligations",
+    ],
+    purposeSecondary: "Secondary purposes (not necessary):",
+    purposeSecondaryItems: [
+      "Send you promotional information about our services",
+      "Conduct satisfaction surveys",
+    ],
+    purposeSecondaryNote:
+      "If you do not wish your data to be processed for secondary purposes, please notify us at: villascandita@yahoo.com.",
+    transferTitle: "4. Data transfers",
+    transferText:
+      "Your personal data may be transferred to the following third parties:",
+    transferItems: [
+      "Openpay: for secure credit or debit card payment processing",
+      "Competent authorities: when required by law or by order of an authority",
+    ],
+    arcoTitle: "5. ARCO rights",
+    arcoText:
+      "You have the right to Access, Rectify, Cancel, or Oppose (ARCO rights) the processing of your personal data. To exercise any of these rights, send your request to: villascandita@yahoo.com, indicating:",
+    arcoItems: [
+      "Full name of the data subject",
+      "Clear description of the data for which you wish to exercise a right",
+      "Any document that facilitates the location of your data",
+    ],
+    arcoResponse:
+      "We will respond to your request within a maximum of 20 business days from the date of receipt.",
+    cookiesTitle: "6. Cookies and tracking technologies",
+    cookiesText:
+      "Our website may use cookies and other tracking technologies to enhance your browsing experience, analyze site traffic, and personalize content. You can disable cookies through your browser settings.",
+    changesTitle: "7. Changes to this privacy policy",
+    changesText:
+      "We reserve the right to modify this privacy policy at any time. Changes will be available on this same web page. We recommend reviewing it periodically.",
+    consentTitle: "8. Consent",
+    consentText:
+      "By providing your personal data through our website or by making a reservation, you consent to the processing of your data in accordance with this privacy policy.",
+    contactTitle: "Contact",
+    contactText:
+      "If you have any questions or comments about this privacy policy, you can contact us at:",
+    contactEmail: "villascandita@yahoo.com",
+    contactPhone: "+52 818 253 3561",
+    contactAddress: "Calle 52 #427 interior b, C.P. 97000",
+    contactLocation: "Mérida, Yucatán, Mexico",
   },
 
   bookingPage: {
