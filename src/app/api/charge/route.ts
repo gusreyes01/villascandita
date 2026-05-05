@@ -115,8 +115,8 @@ export async function POST(req: NextRequest) {
           : data.error_code === 3002
           ? "Tarjeta vencida. Usa una tarjeta vigente."
           : data.error_code === 3004
-          ? "Fondos insuficientes."
-          : data.description ?? "Error al procesar el pago.";
+          ? "Tarjeta Rechazada. Verifica los datos o usa otra tarjeta."
+          : "Error al procesar el pago.";
 
       return NextResponse.json({ error: errorMsg }, { status: 400 });
     }
