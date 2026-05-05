@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
       case "card":
       default: {
         const redirectParams = new URLSearchParams(bookingParams ?? {});
-        const redirectUrl = `${BASE_URL}/3ds-callback?${redirectParams.toString()}`;
+        const redirectUrl = `${BASE_URL.trim()}/3ds-callback?${redirectParams.toString()}`;
         chargePayload = {
           source_id: tokenId,
           method: "card",
