@@ -86,9 +86,8 @@ export async function POST(req: NextRequest) {
             email: customer.email,
             phone_number: customer.phone,
           },
-          use_3d_secure: true,
+          use_3d_secure: "true",
           redirect_url: redirectUrl,
-          capture: true,
         };
         break;
       }
