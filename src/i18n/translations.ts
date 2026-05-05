@@ -286,7 +286,7 @@ export const esTranslations = {
       "El pago total de la reservación se cobra al momento de confirmar",
       "Los pagos se procesan de forma segura a través de Openpay",
       "La tarifa de limpieza se incluye en el desglose del precio",
-      "No se aceptan pagos en efectivo ni transferencias bancarias directas",
+      "Se aceptan pagos con tarjeta, transferencia SPEI y pago en efectivo en tiendas (Paynet)",
     ],
 
     cancellationTitle: "3. Política de cancelación",
@@ -758,7 +758,7 @@ export const enTranslations: Translations = {
       "Full payment is charged at the time of booking confirmation",
       "Payments are securely processed through Openpay",
       "The cleaning fee is included in the price breakdown",
-      "Cash payments or direct bank transfers are not accepted",
+      "Payments accepted via card, SPEI bank transfer, and cash at stores (Paynet)",
     ],
 
     cancellationTitle: "3. Cancellation policy",

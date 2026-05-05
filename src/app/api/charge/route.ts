@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 const OPENPAY_MERCHANT_ID = process.env.OPENPAY_MERCHANT_ID ?? "";
 const OPENPAY_PRIVATE_KEY = process.env.OPENPAY_PRIVATE_KEY ?? "";
 const OPENPAY_SANDBOX = process.env.NEXT_PUBLIC_OPENPAY_SANDBOX !== "false";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
 
 const OPENPAY_BASE_URL = OPENPAY_SANDBOX
   ? "https://sandbox-api.openpay.mx/v1"
@@ -11,7 +12,7 @@ const OPENPAY_BASE_URL = OPENPAY_SANDBOX
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { method, tokenId, amount, description, deviceSessionId, customer, dueDate } = body;
+    const { method, tokenId, amount, description, deviceSessionId, customer, dueDate, bookingParams } = body;
 
     if (!amount || !customer?.email) {
       return NextResponse.json(
@@ -68,7 +69,9 @@ export async function POST(req: NextRequest) {
         break;
 
       case "card":
-      default:
+      default: {
+        const redirectParams = new URLSearchParams(bookingParams ?? {});
+        const redirectUrl = `${BASE_URL}/3ds-callback?${redirectParams.toString()}`;
         chargePayload = {
           source_id: tokenId,
           method: "card",
@@ -83,9 +86,12 @@ export async function POST(req: NextRequest) {
             email: customer.email,
             phone_number: customer.phone,
           },
+          use_3d_secure: true,
+          redirect_url: redirectUrl,
           capture: true,
         };
         break;
+      }
     }
 
     const response = await fetch(
@@ -146,6 +152,16 @@ export async function POST(req: NextRequest) {
           barcodePaybinUrl: data.payment_method?.barcode_paybin_url,
         },
         dueDate: data.due_date,
+      });
+    }
+
+    if (data.status === "charge_pending" && data.payment_method?.url) {
+      return NextResponse.json({
+        success: true,
+        orderId: data.id,
+        status: "charge_pending",
+        method: "card",
+        redirectUrl: data.payment_method.url,
       });
     }
 
