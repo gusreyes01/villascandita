@@ -11,11 +11,18 @@ const OPENPAY_BASE_URL = OPENPAY_SANDBOX
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { tokenId, amount, description, deviceSessionId, customer } = body;
+    const { method, tokenId, amount, description, deviceSessionId, customer, dueDate } = body;
 
-    if (!tokenId || !amount || !customer?.email) {
+    if (!amount || !customer?.email) {
       return NextResponse.json(
         { error: "Datos de pago incompletos." },
+        { status: 400 }
+      );
+    }
+
+    if (method === "card" && !tokenId) {
+      return NextResponse.json(
+        { error: "Token de tarjeta requerido." },
         { status: 400 }
       );
     }
@@ -23,22 +30,63 @@ export async function POST(req: NextRequest) {
     const credentials = Buffer.from(`${OPENPAY_PRIVATE_KEY}:`).toString("base64");
     const orderId = `VC-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-    const chargePayload = {
-      source_id: tokenId,
-      method: "card",
-      amount: Number(amount),
-      currency: "MXN",
-      description,
-      order_id: orderId,
-      device_session_id: deviceSessionId,
-      customer: {
-        name: customer.name,
-        last_name: customer.lastName,
-        email: customer.email,
-        phone_number: customer.phone,
-      },
-      capture: true,
-    };
+    let chargePayload: Record<string, unknown>;
+
+    switch (method) {
+      case "bank_account":
+        chargePayload = {
+          method: "bank_account",
+          amount: Number(amount),
+          currency: "MXN",
+          description,
+          order_id: orderId,
+          due_date: dueDate,
+          customer: {
+            name: customer.name,
+            last_name: customer.lastName,
+            email: customer.email,
+            phone_number: customer.phone,
+          },
+        };
+        break;
+
+      case "store":
+        chargePayload = {
+          method: "store",
+          amount: Number(amount),
+          currency: "MXN",
+          description,
+          order_id: orderId,
+          due_date: dueDate,
+          customer: {
+            name: customer.name,
+            last_name: customer.lastName,
+            email: customer.email,
+            phone_number: customer.phone,
+          },
+        };
+        break;
+
+      case "card":
+      default:
+        chargePayload = {
+          source_id: tokenId,
+          method: "card",
+          amount: Number(amount),
+          currency: "MXN",
+          description,
+          order_id: orderId,
+          device_session_id: deviceSessionId,
+          customer: {
+            name: customer.name,
+            last_name: customer.lastName,
+            email: customer.email,
+            phone_number: customer.phone,
+          },
+          capture: true,
+        };
+        break;
+    }
 
     const response = await fetch(
       `${OPENPAY_BASE_URL}/${OPENPAY_MERCHANT_ID}/charges`,
@@ -67,13 +115,45 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: errorMsg }, { status: 400 });
     }
 
-    // Here you would typically save the booking to your database
-    // e.g.: await saveBooking({ ...booking, chargeId: data.id, customer })
+    if (method === "bank_account") {
+      return NextResponse.json({
+        success: true,
+        orderId: data.id,
+        status: data.status,
+        method: "bank_account",
+        paymentMethod: {
+          type: data.payment_method?.type,
+          bank: data.payment_method?.bank,
+          clabe: data.payment_method?.clabe,
+          name: data.payment_method?.name,
+          agreement: data.payment_method?.agreement,
+        },
+        dueDate: data.due_date,
+      });
+    }
+
+    if (method === "store") {
+      return NextResponse.json({
+        success: true,
+        orderId: data.id,
+        status: data.status,
+        method: "store",
+        paymentMethod: {
+          type: data.payment_method?.type,
+          reference: data.payment_method?.reference,
+          barcodeUrl: data.payment_method?.barcode_url,
+          paybinReference: data.payment_method?.paybin_reference,
+          barcodePaybinUrl: data.payment_method?.barcode_paybin_url,
+        },
+        dueDate: data.due_date,
+      });
+    }
 
     return NextResponse.json({
       success: true,
       orderId: data.id,
       status: data.status,
+      method: "card",
     });
   } catch (error) {
     console.error("Openpay charge error:", error);

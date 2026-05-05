@@ -262,6 +262,88 @@ export const esTranslations = {
     contactLocation: "Mérida, Yucatán, México",
   },
 
+  termsPage: {
+    title: "Términos y condiciones",
+    lastUpdated: "Última actualización: mayo 2026",
+    backHome: "Volver al inicio",
+    intro:
+      "Al realizar una reservación o utilizar los servicios de Villas Candita, usted acepta los presentes términos y condiciones. Le recomendamos leerlos detenidamente antes de proceder con su reserva.",
+
+    reservationsTitle: "1. Reservaciones",
+    reservationsText:
+      "Las reservaciones se consideran confirmadas únicamente cuando se ha realizado el pago completo a través de nuestra plataforma de pagos (Openpay). Al completar una reservación, usted recibirá un correo electrónico de confirmación con los detalles de su estancia.",
+    reservationsItems: [
+      "La estadía mínima es de 2 noches",
+      "El check-in es a partir de las 3:00 PM",
+      "El check-out es antes de las 12:00 PM",
+      "La capacidad máxima de la propiedad debe respetarse en todo momento",
+    ],
+
+    paymentsTitle: "2. Pagos y precios",
+    paymentsText:
+      "Todos los precios publicados en nuestro sitio web están expresados en pesos mexicanos (MXN) e incluyen los impuestos aplicables.",
+    paymentsItems: [
+      "El pago total de la reservación se cobra al momento de confirmar",
+      "Los pagos se procesan de forma segura a través de Openpay",
+      "La tarifa de limpieza se incluye en el desglose del precio",
+      "No se aceptan pagos en efectivo ni transferencias bancarias directas",
+    ],
+
+    cancellationTitle: "3. Política de cancelación",
+    cancellationText:
+      "Entendemos que los planes pueden cambiar. Nuestra política de cancelación es la siguiente:",
+    cancellationItems: [
+      "Cancelación gratuita hasta 7 días antes de la fecha de llegada, con reembolso completo",
+      "Cancelaciones realizadas entre 3 y 6 días antes de la llegada: reembolso del 50%",
+      "Cancelaciones realizadas con menos de 3 días de anticipación o no-show: sin reembolso",
+      "Las solicitudes de cancelación deben enviarse por correo electrónico a villascandita@yahoo.com",
+    ],
+
+    houseRulesTitle: "4. Reglas de la casa",
+    houseRulesText:
+      "Para garantizar una estancia agradable para todos, le pedimos respetar las siguientes reglas:",
+    houseRulesItems: [
+      "No se permiten fiestas ni eventos sin autorización previa",
+      "No se permite fumar dentro de la propiedad",
+      "Se permite el ingreso de mascotas únicamente con autorización previa y sujeto a un depósito adicional",
+      "El horario de silencio es de 10:00 PM a 8:00 AM",
+      "Respetar la capacidad máxima de huéspedes indicada en la reservación",
+      "No se permite el uso de la piscina bajo efectos del alcohol o sustancias",
+    ],
+
+    liabilityTitle: "5. Responsabilidad",
+    liabilityText:
+      "Villas Candita no se hace responsable por:",
+    liabilityItems: [
+      "Objetos personales perdidos, dañados o robados durante la estancia",
+      "Lesiones o accidentes ocurridos dentro de la propiedad",
+      "Interrupciones en servicios públicos (agua, electricidad, internet) causadas por terceros",
+      "Cambios climáticos o eventos de fuerza mayor que afecten la estancia",
+    ],
+    liabilityNote:
+      "El huésped es responsable de cualquier daño causado a la propiedad, mobiliario o equipamiento durante su estancia. Los costos de reparación o reposición serán cobrados al huésped.",
+
+    intellectualPropertyTitle: "6. Propiedad intelectual",
+    intellectualPropertyText:
+      "Todo el contenido de este sitio web, incluyendo textos, fotografías, diseños, logotipos y elementos gráficos, es propiedad de Villas Candita y está protegido por las leyes de propiedad intelectual de México. Queda prohibida su reproducción, distribución o uso sin autorización previa por escrito.",
+
+    modificationsTitle: "7. Modificaciones a los términos",
+    modificationsText:
+      "Villas Candita se reserva el derecho de modificar estos términos y condiciones en cualquier momento. Las modificaciones entrarán en vigor a partir de su publicación en esta página. Las reservaciones existentes se regirán por los términos vigentes al momento de su confirmación.",
+
+    governingLawTitle: "8. Legislación aplicable",
+    governingLawText:
+      "Los presentes términos y condiciones se rigen por la legislación vigente en los Estados Unidos Mexicanos. Para la resolución de cualquier controversia derivada de los presentes términos, las partes se someten a la jurisdicción de los tribunales competentes de la ciudad de Mérida, Yucatán.",
+
+    contactTitle: "Contacto",
+    contactText:
+      "Si tiene alguna duda sobre estos términos y condiciones, puede contactarnos en:",
+    contactEmail: "villascandita@yahoo.com",
+    contactPhone: "+52 818 253 3561",
+    contactAddress: "Calle 52 #427 interior b, C.P. 97000",
+    contactLocation: "Mérida, Yucatán, México",
+  },
+
   bookingPage: {
     loading: "Cargando reserva...",
     back: "Volver",
@@ -314,6 +396,35 @@ export const esTranslations = {
     selectDates: "Seleccionar fechas",
     perNight: "MXN/noche",
     dateArrow: "→",
+    paymentMethodTitle: "Elige tu metodo de pago",
+    methodCard: "Tarjeta de credito/debito",
+    methodCardDesc: "Pago inmediato con Visa, Mastercard o Amex",
+    methodSpei: "Transferencia SPEI",
+    methodSpeiDesc: "Transferencia bancaria electronica (1-24 hrs)",
+    methodPaynet: "Pago en efectivo (Paynet)",
+    methodPaynetDesc: "Paga en tiendas de conveniencia con tu referencia",
+    speiInstructions: "Realiza una transferencia SPEI con los siguientes datos:",
+    speiBank: "Banco destino",
+    speiClabe: "CLABE interbancaria",
+    speiReference: "Referencia",
+    speiAgreement: "Convenio CIE",
+    speiAmount: "Monto exacto",
+    speiDueDate: "Fecha limite de pago",
+    speiNote: "Tu reserva se confirmara automaticamente al recibir el pago. Usa exactamente el monto indicado para que se pueda identificar.",
+    paynetInstructions: "Presenta esta referencia en cualquier tienda de conveniencia afiliada a Paynet:",
+    paynetReference: "Referencia de pago",
+    paynetBarcode: "Codigo de barras",
+    paynetAmount: "Monto a pagar",
+    paynetDueDate: "Fecha limite de pago",
+    paynetStores: "Tiendas afiliadas: 7-Eleven, Farmacias del Ahorro, Walmart, Bodega Aurrera, Sam's Club, Soriana, entre otras.",
+    paynetNote: "Tu reserva se confirmara automaticamente al recibir el pago.",
+    pendingPaymentTitle: "Pago pendiente",
+    pendingPaymentSubtitle: "Completa tu pago para confirmar tu reserva",
+    copiedToClipboard: "Copiado al portapapeles",
+    copy: "Copiar",
+    payBefore: "Paga antes de",
+    generatePayment: "Generar datos de pago",
+    generatingPayment: "Generando...",
   },
 
   confirmationPage: {
@@ -623,6 +734,88 @@ export const enTranslations: Translations = {
     contactLocation: "Mérida, Yucatán, Mexico",
   },
 
+  termsPage: {
+    title: "Terms and conditions",
+    lastUpdated: "Last updated: May 2026",
+    backHome: "Back to home",
+    intro:
+      "By making a reservation or using the services of Villas Candita, you accept these terms and conditions. We recommend reading them carefully before proceeding with your booking.",
+
+    reservationsTitle: "1. Reservations",
+    reservationsText:
+      "Reservations are considered confirmed only when full payment has been made through our payment platform (Openpay). Upon completing a reservation, you will receive a confirmation email with the details of your stay.",
+    reservationsItems: [
+      "Minimum stay is 2 nights",
+      "Check-in is from 3:00 PM",
+      "Check-out is before 12:00 PM",
+      "The maximum capacity of the property must be respected at all times",
+    ],
+
+    paymentsTitle: "2. Payments and pricing",
+    paymentsText:
+      "All prices listed on our website are expressed in Mexican pesos (MXN) and include applicable taxes.",
+    paymentsItems: [
+      "Full payment is charged at the time of booking confirmation",
+      "Payments are securely processed through Openpay",
+      "The cleaning fee is included in the price breakdown",
+      "Cash payments or direct bank transfers are not accepted",
+    ],
+
+    cancellationTitle: "3. Cancellation policy",
+    cancellationText:
+      "We understand plans can change. Our cancellation policy is as follows:",
+    cancellationItems: [
+      "Free cancellation up to 7 days before the check-in date, with full refund",
+      "Cancellations made between 3 and 6 days before arrival: 50% refund",
+      "Cancellations made less than 3 days before arrival or no-show: no refund",
+      "Cancellation requests must be sent by email to villascandita@yahoo.com",
+    ],
+
+    houseRulesTitle: "4. House rules",
+    houseRulesText:
+      "To ensure a pleasant stay for everyone, we ask you to follow these rules:",
+    houseRulesItems: [
+      "No parties or events without prior authorization",
+      "No smoking inside the property",
+      "Pets are allowed only with prior authorization and subject to an additional deposit",
+      "Quiet hours are from 10:00 PM to 8:00 AM",
+      "Respect the maximum guest capacity specified in the reservation",
+      "Pool use under the influence of alcohol or substances is not permitted",
+    ],
+
+    liabilityTitle: "5. Liability",
+    liabilityText:
+      "Villas Candita is not responsible for:",
+    liabilityItems: [
+      "Personal items lost, damaged, or stolen during the stay",
+      "Injuries or accidents occurring within the property",
+      "Interruptions to public services (water, electricity, internet) caused by third parties",
+      "Weather changes or force majeure events affecting the stay",
+    ],
+    liabilityNote:
+      "The guest is responsible for any damage caused to the property, furniture, or equipment during their stay. Repair or replacement costs will be charged to the guest.",
+
+    intellectualPropertyTitle: "6. Intellectual property",
+    intellectualPropertyText:
+      "All content on this website, including texts, photographs, designs, logos, and graphic elements, is the property of Villas Candita and is protected by Mexican intellectual property laws. Reproduction, distribution, or use without prior written authorization is prohibited.",
+
+    modificationsTitle: "7. Changes to these terms",
+    modificationsText:
+      "Villas Candita reserves the right to modify these terms and conditions at any time. Changes will take effect upon publication on this page. Existing reservations will be governed by the terms in effect at the time of their confirmation.",
+
+    governingLawTitle: "8. Governing law",
+    governingLawText:
+      "These terms and conditions are governed by the laws of the United Mexican States. For the resolution of any dispute arising from these terms, the parties submit to the jurisdiction of the competent courts of the city of Merida, Yucatan.",
+
+    contactTitle: "Contact",
+    contactText:
+      "If you have any questions about these terms and conditions, you can contact us at:",
+    contactEmail: "villascandita@yahoo.com",
+    contactPhone: "+52 818 253 3561",
+    contactAddress: "Calle 52 #427 interior b, C.P. 97000",
+    contactLocation: "Merida, Yucatan, Mexico",
+  },
+
   bookingPage: {
     loading: "Loading reservation...",
     back: "Back",
@@ -675,6 +868,35 @@ export const enTranslations: Translations = {
     selectDates: "Select dates",
     perNight: "MXN/night",
     dateArrow: "→",
+    paymentMethodTitle: "Choose your payment method",
+    methodCard: "Credit/debit card",
+    methodCardDesc: "Instant payment with Visa, Mastercard or Amex",
+    methodSpei: "SPEI bank transfer",
+    methodSpeiDesc: "Electronic bank transfer (1-24 hrs)",
+    methodPaynet: "Cash payment (Paynet)",
+    methodPaynetDesc: "Pay at convenience stores with your reference",
+    speiInstructions: "Make a SPEI transfer with the following details:",
+    speiBank: "Destination bank",
+    speiClabe: "CLABE account",
+    speiReference: "Reference",
+    speiAgreement: "CIE Agreement",
+    speiAmount: "Exact amount",
+    speiDueDate: "Payment deadline",
+    speiNote: "Your booking will be automatically confirmed upon receiving the payment. Use the exact amount shown so it can be identified.",
+    paynetInstructions: "Present this reference at any Paynet-affiliated convenience store:",
+    paynetReference: "Payment reference",
+    paynetBarcode: "Barcode",
+    paynetAmount: "Amount to pay",
+    paynetDueDate: "Payment deadline",
+    paynetStores: "Affiliated stores: 7-Eleven, Farmacias del Ahorro, Walmart, Bodega Aurrera, Sam's Club, Soriana, and more.",
+    paynetNote: "Your booking will be automatically confirmed upon receiving the payment.",
+    pendingPaymentTitle: "Payment pending",
+    pendingPaymentSubtitle: "Complete your payment to confirm your booking",
+    copiedToClipboard: "Copied to clipboard",
+    copy: "Copy",
+    payBefore: "Pay before",
+    generatePayment: "Generate payment details",
+    generatingPayment: "Generating...",
   },
 
   confirmationPage: {

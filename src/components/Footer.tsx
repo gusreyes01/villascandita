@@ -110,7 +110,7 @@ export default function Footer() {
           <p>© {new Date().getFullYear()} Villas Candita. {t.footer.rights}</p>
           <div className="flex gap-6">
             <Link href="/aviso-de-privacidad" className="hover:text-white/70 transition-colors">{t.footer.privacy}</Link>
-            <a href="#" className="hover:text-white/70 transition-colors">{t.footer.terms}</a>
+            <Link href="/terminos-y-condiciones" className="hover:text-white/70 transition-colors">{t.footer.terms}</Link>
           </div>
         </div>
       </div>
