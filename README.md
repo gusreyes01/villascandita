@@ -1,116 +1,81 @@
 # Villas Candita
 
-Sitio web de renta vacacional para Villas Candita en Merida, Yucatan, Mexico.
+Bilingual vacation-rental site for Villas Candita in Merida, Yucatan. It uses
+Next.js 16, TypeScript, Tailwind CSS, and Openpay card, SPEI, and Paynet flows.
 
-## Tecnologias
+## Requirements
 
-- Next.js 15 (App Router)
-- TypeScript
-- Tailwind CSS
-- react-date-range (selector de fechas)
-- Openpay (procesador de pagos mexicano)
-- Vercel (hosting)
+- Node.js 20.9 or newer
+- npm
+- Openpay sandbox credentials for payment testing
 
-## Estructura del proyecto
+## Local setup
 
+```bash
+npm ci
+cp .env.example .env.local
+npm run dev
 ```
+
+Configure all values documented in `.env.example`. `APP_BASE_URL` may use
+`http://localhost` locally; production must use HTTPS. Generate
+`PAYMENT_SIGNING_SECRET` with at least 32 random characters.
+
+Open <http://localhost:3000> after the development server starts.
+
+## Quality checks
+
+```bash
+npm run check
+npm run build
+npm audit --omit=dev
+```
+
+`npm run check` runs ESLint, the TypeScript compiler, and the Vitest suite. The
+same checks and a production build run for every pull request and push to
+`main`.
+
+## Payment security model
+
+The browser sends only a payment token, customer details, and the requested room
+and stay. The API validates a strict schema and independently derives:
+
+- room rate, number of nights, cleaning fee, and total amount;
+- availability and room-capacity constraints;
+- Openpay description, order identifier, due date, and redirect URL.
+
+Client-supplied amount, description, and due-date fields are rejected. Pending
+3D Secure verification is bound to the provider charge with a short-lived,
+HttpOnly, HMAC-signed cookie before the server retrieves charge status.
+
+Openpay card data is tokenized in the browser and must never be logged or sent
+directly to this application.
+
+## Project layout
+
+```text
 src/
   app/
-    page.tsx              - Pagina principal (landing)
-    booking/
-      page.tsx            - Wrapper con Suspense
-      BookingForm.tsx     - Formulario de reserva + pago con Openpay
-    confirmation/
-      page.tsx            - Wrapper con Suspense
-      ConfirmationContent.tsx  - Pagina de confirmacion exitosa
-    api/
-      charge/
-        route.ts          - API endpoint para cobros con Openpay
-  components/
-    Header.tsx            - Navegacion con scroll behavior
-    Hero.tsx              - Seccion hero con fondo y CTA
-    AboutSection.tsx      - Historia y descripcion de la villa
-    Amenities.tsx         - Grid de comodidades
-    Gallery.tsx           - Galeria con lightbox
-    BookingWidget.tsx     - Selector de fechas + calculo de precio
-    Testimonials.tsx      - Resenas de huespedes
-    Location.tsx          - Ubicacion y mapa
-    Footer.tsx            - Pie de pagina
+    api/charge/          Openpay charge and verification routes
+    booking/             Guest and payment workflow
+    confirmation/        Successful booking summary
+  components/            Landing page and booking UI
+  lib/
+    booking.ts           Authoritative rooms, availability, and quotes
+    payment.ts           Strict request validation and provider payloads
+    payment-verification.ts
+tests/                   Pricing, validation, and signature tests
 ```
 
-## Configuracion local
+Update room rates, capacity, and blocked dates in `src/lib/booking.ts`; both the
+browser and API consume that single source of truth.
 
-1. Instalar dependencias:
-   ```bash
-   npm install
-   ```
+## Deployment
 
-2. Copiar el archivo de variables de entorno:
-   ```bash
-   cp .env.example .env.local
-   ```
+Set every variable in `.env.example` in the deployment environment. Use live
+Openpay keys, `NEXT_PUBLIC_OPENPAY_SANDBOX=false`, a strong independent signing
+secret, and an HTTPS `APP_BASE_URL`. Vercel can deploy the application from
+`main` after CI passes.
 
-3. Configurar tus credenciales de Openpay en `.env.local`:
-   - Obtener credenciales en https://dashboard.openpay.mx
-   - Llenar `NEXT_PUBLIC_OPENPAY_MERCHANT_ID`, `NEXT_PUBLIC_OPENPAY_PUBLIC_KEY` y `OPENPAY_PRIVATE_KEY`
-
-4. Iniciar el servidor de desarrollo:
-   ```bash
-   npm run dev
-   ```
-
-5. Abrir http://localhost:3000
-
-## Configuracion de Openpay
-
-El flujo de pago funciona asi:
-
-1. El usuario selecciona fechas en el `BookingWidget` y el precio se calcula automaticamente
-2. Al hacer clic en "Reservar", va a `/booking` con los parametros en la URL
-3. El usuario llena sus datos y la informacion de su tarjeta
-4. El frontend tokeniza la tarjeta con `OpenPay.token.create()` (sin datos sensibles en el servidor)
-5. El token se envia al API route `/api/charge` que hace el cobro via la API REST de Openpay
-6. En caso de exito, el usuario es redirigido a `/confirmation`
-
-### Credenciales de prueba (sandbox)
-
-Tarjeta de prueba aprobada: `4111 1111 1111 1111`
-Fecha: cualquier fecha futura
-CVV: cualquier numero de 3 digitos
-
-## Imagenes de la propiedad
-
-Actualmente el sitio usa imagenes de Unsplash como placeholders. Para usar las fotos reales:
-
-1. Agregar las imagenes en `public/images/`
-2. Actualizar las rutas en:
-   - `src/components/Hero.tsx` (imagen de fondo del hero)
-   - `src/components/AboutSection.tsx` (grid de imagenes)
-   - `src/components/Gallery.tsx` (array `galleryImages`)
-   - `src/app/booking/BookingForm.tsx` (imagen del summary)
-
-## Precios y disponibilidad
-
-Editar en `src/components/BookingWidget.tsx`:
-
-```typescript
-const NIGHTLY_RATE = 2500; // MXN por noche
-const CLEANING_FEE = 800;  // Tarifa de limpieza fija
-const MIN_NIGHTS = 2;      // Minimo de noches
-
-// Fechas bloqueadas (no disponibles)
-const blockedDates: Date[] = [
-  new Date("2026-03-15"),
-  // ...
-];
-```
-
-## Despliegue en Vercel
-
-1. Conectar el repositorio en https://vercel.com
-2. Configurar las variables de entorno en Vercel:
-   - `NEXT_PUBLIC_OPENPAY_MERCHANT_ID`
-   - `NEXT_PUBLIC_OPENPAY_PUBLIC_KEY`
-   - `OPENPAY_PRIVATE_KEY`
-   - `NEXT_PUBLIC_OPENPAY_SANDBOX` (cambiar a `"false"` en produccion)
-3. Vercel desplegara automaticamente en cada push a `main`
+See `SECURITY.md` for private vulnerability reporting and `CONTRIBUTING.md` for
+the contribution workflow.

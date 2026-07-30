@@ -32,6 +32,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const stored = localStorage.getItem("vc-lang") as Lang | null;
     if (stored === "en" || stored === "es") {
+      // Browser-only preference restoration is intentionally post-hydration.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLang(stored);
     }
   }, []);

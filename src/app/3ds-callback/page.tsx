@@ -7,21 +7,33 @@ import { AlertCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
 
 function ThreeDSCallbackContent() {
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams()!;
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
+  const chargeId = searchParams.get("id");
+  const checkoutToken = searchParams.get("checkout");
+  const [error, setError] = useState<string | null>(
+    chargeId && checkoutToken
+      ? null
+      : "No se encontro una sesion de pago valida."
+  );
 
   useEffect(() => {
-    const chargeId = searchParams.get("id");
-    if (!chargeId) {
-      setError("No se encontro el ID de la transaccion.");
-      return;
-    }
+    if (!chargeId || !checkoutToken) return;
 
-    const verify = async () => {
+    let cancelled = false;
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const verify = async (attempt = 0) => {
       try {
-        const res = await fetch(`/api/charge/verify?id=${chargeId}`);
+        const params = new URLSearchParams({
+          id: chargeId,
+          checkout: checkoutToken,
+        });
+        const res = await fetch(`/api/charge/verify?${params.toString()}`, {
+          cache: "no-store",
+        });
         const data = await res.json();
+        if (cancelled) return;
 
         if (!res.ok || data.error) {
           setError(data.error ?? "Error al verificar el pago.");
@@ -29,19 +41,17 @@ function ThreeDSCallbackContent() {
         }
 
         if (data.status === "completed") {
-          const params = new URLSearchParams({
-            orderId: data.orderId ?? data.id,
-            checkIn: searchParams.get("checkIn") ?? "",
-            checkOut: searchParams.get("checkOut") ?? "",
-            nights: searchParams.get("nights") ?? "0",
-            guests: searchParams.get("guests") ?? "1",
-            total: searchParams.get("total") ?? "0",
-            name: searchParams.get("name") ?? "",
-            email: searchParams.get("email") ?? "",
-          });
-          router.replace(`/confirmation?${params.toString()}`);
+          if (!data.receiptToken) {
+            setError("No se pudo validar el comprobante del pago.");
+            return;
+          }
+          router.replace(
+            `/confirmation?receipt=${encodeURIComponent(data.receiptToken)}`
+          );
         } else if (data.status === "failed") {
           setError("El pago fue rechazado. Intenta con otra tarjeta.");
+        } else if (attempt < 4) {
+          retryTimer = setTimeout(() => verify(attempt + 1), 2000);
         } else {
           setError(
             `El pago no pudo ser confirmado (estado: ${data.status}). Contacta a soporte.`
@@ -53,7 +63,11 @@ function ThreeDSCallbackContent() {
     };
 
     verify();
-  }, [searchParams, router]);
+    return () => {
+      cancelled = true;
+      if (retryTimer) clearTimeout(retryTimer);
+    };
+  }, [chargeId, checkoutToken, router]);
 
   if (error) {
     return (

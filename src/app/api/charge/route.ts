@@ -1,100 +1,127 @@
+import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
+import { calculateQuote } from "@/lib/booking";
+import {
+  buildBookingSummary,
+  buildChargePayload,
+  chargeRequestSchema,
+} from "@/lib/payment";
+import {
+  createChargeVerificationToken,
+  createCheckoutToken,
+  createReceiptToken,
+} from "@/lib/payment-verification";
 
-const OPENPAY_MERCHANT_ID = process.env.OPENPAY_MERCHANT_ID ?? "";
-const OPENPAY_PRIVATE_KEY = process.env.OPENPAY_PRIVATE_KEY ?? "";
 const OPENPAY_SANDBOX = process.env.NEXT_PUBLIC_OPENPAY_SANDBOX !== "false";
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
-
 const OPENPAY_BASE_URL = OPENPAY_SANDBOX
   ? "https://sandbox-api.openpay.mx/v1"
   : "https://api.openpay.mx/v1";
 
-export async function POST(req: NextRequest) {
+function paymentConfiguration():
+  | {
+      success: true;
+      merchantId: string;
+      privateKey: string;
+      signingSecret: string;
+      baseUrl: string;
+    }
+  | { success: false } {
+  const merchantId = process.env.OPENPAY_MERCHANT_ID?.trim();
+  const privateKey = process.env.OPENPAY_PRIVATE_KEY?.trim();
+  const signingSecret = process.env.PAYMENT_SIGNING_SECRET?.trim();
+  const configuredBaseUrl = process.env.APP_BASE_URL?.trim();
+
+  if (
+    !merchantId ||
+    !privateKey ||
+    !signingSecret ||
+    signingSecret.length < 32 ||
+    !configuredBaseUrl
+  ) {
+    return { success: false };
+  }
+
   try {
-    const body = await req.json();
-    const { method, tokenId, amount, description, deviceSessionId, customer, dueDate, bookingParams } = body;
-
-    if (!amount || !customer?.email) {
-      return NextResponse.json(
-        { error: "Datos de pago incompletos." },
-        { status: 400 }
-      );
+    const url = new URL(configuredBaseUrl);
+    const isLocalhost = url.hostname === "localhost";
+    const isSandboxLocalHttp =
+      OPENPAY_SANDBOX && isLocalhost && url.protocol === "http:";
+    if ((!OPENPAY_SANDBOX && isLocalhost) || (
+      url.protocol !== "https:" && !isSandboxLocalHttp
+    )) {
+      return { success: false };
     }
+    return {
+      success: true,
+      merchantId,
+      privateKey,
+      signingSecret,
+      baseUrl: url.origin,
+    };
+  } catch {
+    return { success: false };
+  }
+}
 
-    if (method === "card" && !tokenId) {
-      return NextResponse.json(
-        { error: "Token de tarjeta requerido." },
-        { status: 400 }
-      );
-    }
+function openpayErrorMessage(errorCode: number | undefined): string {
+  switch (errorCode) {
+    case 3001:
+    case 3004:
+      return "Tarjeta rechazada. Verifica los datos o usa otra tarjeta.";
+    case 3002:
+      return "Tarjeta vencida. Usa una tarjeta vigente.";
+    default:
+      return "Error al procesar el pago.";
+  }
+}
 
-    const credentials = Buffer.from(`${OPENPAY_PRIVATE_KEY}:`).toString("base64");
-    const orderId = `VC-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+export async function POST(req: NextRequest) {
+  const configuration = paymentConfiguration();
+  if (!configuration.success) {
+    return NextResponse.json(
+      { error: "El servicio de pagos no está configurado." },
+      { status: 503 }
+    );
+  }
 
-    let chargePayload: Record<string, unknown>;
+  let rawBody: unknown;
+  try {
+    rawBody = await req.json();
+  } catch {
+    return NextResponse.json({ error: "JSON inválido." }, { status: 400 });
+  }
 
-    switch (method) {
-      case "bank_account":
-        chargePayload = {
-          method: "bank_account",
-          amount: Number(amount),
-          currency: "MXN",
-          description,
-          order_id: orderId,
-          due_date: dueDate,
-          customer: {
-            name: customer.name,
-            last_name: customer.lastName,
-            email: customer.email,
-            phone_number: customer.phone,
-          },
-        };
-        break;
+  const parsed = chargeRequestSchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Datos de pago inválidos.", issues: parsed.error.issues },
+      { status: 400 }
+    );
+  }
 
-      case "store":
-        chargePayload = {
-          method: "store",
-          amount: Number(amount),
-          currency: "MXN",
-          description,
-          order_id: orderId,
-          due_date: dueDate,
-          customer: {
-            name: customer.name,
-            last_name: customer.lastName,
-            email: customer.email,
-            phone_number: customer.phone,
-          },
-        };
-        break;
+  const quote = calculateQuote(parsed.data.booking);
+  if (!quote.success) {
+    return NextResponse.json({ error: quote.error, code: quote.code }, { status: 400 });
+  }
 
-      case "card":
-      default: {
-        const redirectParams = new URLSearchParams(bookingParams ?? {});
-        const redirectUrl = `${BASE_URL.trim()}/3ds-callback?${redirectParams.toString()}`;
-        chargePayload = {
-          source_id: tokenId,
-          method: "card",
-          amount: Number(amount),
-          currency: "MXN",
-          description,
-          order_id: orderId,
-          device_session_id: deviceSessionId,
-          customer: {
-            name: customer.name,
-            last_name: customer.lastName,
-            email: customer.email,
-            phone_number: customer.phone,
-          },
-          use_3d_secure: "true",
-          redirect_url: redirectUrl,
-        };
-        break;
-      }
-    }
+  const dueDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString();
+  const orderId = `VC-${Date.now()}-${randomUUID().slice(0, 8)}`;
+  const booking = buildBookingSummary(quote, parsed.data.customer);
+  const checkoutToken = createCheckoutToken(
+    { orderId, booking },
+    configuration.signingSecret
+  );
+  const redirectUrl = `${configuration.baseUrl}/3ds-callback?checkout=${encodeURIComponent(checkoutToken)}`;
+  const chargePayload = buildChargePayload(parsed.data, quote, {
+    orderId,
+    dueDate,
+    redirectUrl,
+  });
+  const credentials = Buffer.from(`${configuration.privateKey}:`).toString("base64");
 
+  try {
     const response = await fetch(
-      `${OPENPAY_BASE_URL}/${OPENPAY_MERCHANT_ID}/charges`,
+      `${OPENPAY_BASE_URL}/${configuration.merchantId}/charges`,
       {
         method: "POST",
         headers: {
@@ -102,30 +129,32 @@ export async function POST(req: NextRequest) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(chargePayload),
+        signal: AbortSignal.timeout(15_000),
       }
     );
 
-    const data = await response.json();
+    const data = (await response.json()) as {
+      id?: string;
+      status?: string;
+      error_code?: number;
+      due_date?: string;
+      payment_method?: Record<string, string>;
+    };
 
-    if (!response.ok) {
-      const errorMsg =
-        data.error_code === 3001
-          ? "Tarjeta rechazada. Verifica los datos o usa otra tarjeta."
-          : data.error_code === 3002
-          ? "Tarjeta vencida. Usa una tarjeta vigente."
-          : data.error_code === 3004
-          ? "Tarjeta Rechazada. Verifica los datos o usa otra tarjeta."
-          : "Error al procesar el pago.";
-
-      return NextResponse.json({ error: errorMsg }, { status: 400 });
+    if (!response.ok || !data.id) {
+      return NextResponse.json(
+        { error: openpayErrorMessage(data.error_code) },
+        { status: 400 }
+      );
     }
 
-    if (method === "bank_account") {
+    if (parsed.data.method === "bank_account") {
       return NextResponse.json({
         success: true,
         orderId: data.id,
         status: data.status,
         method: "bank_account",
+        amount: quote.total,
         paymentMethod: {
           type: data.payment_method?.type,
           bank: data.payment_method?.bank,
@@ -137,12 +166,13 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    if (method === "store") {
+    if (parsed.data.method === "store") {
       return NextResponse.json({
         success: true,
         orderId: data.id,
         status: data.status,
         method: "store",
+        amount: quote.total,
         paymentMethod: {
           type: data.payment_method?.type,
           reference: data.payment_method?.reference,
@@ -155,13 +185,31 @@ export async function POST(req: NextRequest) {
     }
 
     if (data.status === "charge_pending" && data.payment_method?.url) {
-      return NextResponse.json({
+      const result = NextResponse.json({
         success: true,
         orderId: data.id,
         status: "charge_pending",
         method: "card",
+        amount: quote.total,
+        booking,
         redirectUrl: data.payment_method.url,
       });
+      result.cookies.set(
+        "vc_charge_verification",
+        createChargeVerificationToken(
+          data.id,
+          checkoutToken,
+          configuration.signingSecret
+        ),
+        {
+          httpOnly: true,
+          secure: !OPENPAY_SANDBOX,
+          sameSite: "lax",
+          maxAge: 15 * 60,
+          path: "/api/charge/verify",
+        }
+      );
+      return result;
     }
 
     return NextResponse.json({
@@ -169,12 +217,17 @@ export async function POST(req: NextRequest) {
       orderId: data.id,
       status: data.status,
       method: "card",
+      amount: quote.total,
+      receiptToken: createReceiptToken(
+        { orderId: data.id, ...booking },
+        configuration.signingSecret
+      ),
     });
   } catch (error) {
     console.error("Openpay charge error:", error);
     return NextResponse.json(
-      { error: "Error interno del servidor. Intenta de nuevo." },
-      { status: 500 }
+      { error: "Error temporal del servicio de pagos. Intenta de nuevo." },
+      { status: 502 }
     );
   }
 }

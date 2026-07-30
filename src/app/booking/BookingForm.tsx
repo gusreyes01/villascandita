@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { format, parseISO, addDays } from "date-fns";
+import { format, parseISO } from "date-fns";
 import {
   CalendarDays,
   Users,
@@ -17,8 +17,10 @@ import {
   Clock,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { FaCcVisa, FaCcMastercard, FaCcAmex } from "react-icons/fa";
 import { useLanguage } from "@/context/LanguageContext";
+import { calculateQuote } from "@/lib/booking";
 
 declare global {
   interface Window {
@@ -58,19 +60,31 @@ interface PaynetData {
 }
 
 export default function BookingForm() {
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams()!;
   const router = useRouter();
-  const { t, dateLocale } = useLanguage();
+  const { t, dateLocale, lang } = useLanguage();
 
   const checkIn = searchParams.get("checkIn") ?? "";
   const checkOut = searchParams.get("checkOut") ?? "";
-  const nights = parseInt(searchParams.get("nights") ?? "0");
-  const guests = parseInt(searchParams.get("guests") ?? "1");
-  const subtotal = parseInt(searchParams.get("subtotal") ?? "0");
-  const cleaningFee = parseInt(searchParams.get("cleaningFee") ?? "0");
-  const total = parseInt(searchParams.get("total") ?? "0");
-  const roomName = searchParams.get("roomName") ?? "Villas Candita";
-  const rate = parseInt(searchParams.get("rate") ?? "0");
+  const roomId = searchParams.get("room") ?? "";
+  const requestedGuests = Number(searchParams.get("guests") ?? "1");
+  const quote = calculateQuote({
+    roomId,
+    checkIn,
+    checkOut,
+    guests: requestedGuests,
+  });
+  const nights = quote.success ? quote.nights : 0;
+  const guests = quote.success ? quote.guests : 0;
+  const subtotal = quote.success ? quote.subtotal : 0;
+  const cleaningFee = quote.success ? quote.cleaningFee : 0;
+  const total = quote.success ? quote.total : 0;
+  const roomName = quote.success
+    ? lang === "es"
+      ? quote.room.nameEs
+      : quote.room.nameEn
+    : "Villas Candita";
+  const rate = quote.success ? quote.room.rate : 0;
 
   const [step, setStep] = useState<1 | 2>(1);
   const [loading, setLoading] = useState(false);
@@ -165,22 +179,12 @@ export default function BookingForm() {
       async (response: { data: { id: string } }) => {
         const tokenId = response.data.id;
         try {
-          const bookingParams = {
-            checkIn, checkOut,
-            nights: nights.toString(),
-            guests: guests.toString(),
-            total: total.toString(),
-            name: guestForm.firstName,
-            email: guestForm.email,
-          };
           const res = await fetch("/api/charge", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               method: "card",
               tokenId,
-              amount: total,
-              description: `Villas Candita - ${roomName} — ${checkIn} to ${checkOut} (${nights} nights)`,
               deviceSessionId,
               customer: {
                 name: guestForm.firstName,
@@ -188,7 +192,12 @@ export default function BookingForm() {
                 email: guestForm.email,
                 phone: guestForm.phone,
               },
-              bookingParams,
+              booking: {
+                roomId,
+                checkIn,
+                checkOut,
+                guests,
+              },
             }),
           });
           const data = await res.json();
@@ -199,11 +208,10 @@ export default function BookingForm() {
             return;
           }
 
-          const params = new URLSearchParams({
-            orderId: data.orderId ?? `VC-${Date.now()}`,
-            ...bookingParams,
-          });
-          router.push(`/confirmation?${params.toString()}`);
+          if (!data.receiptToken) throw new Error(t.bookingPage.errorGeneric);
+          router.push(
+            `/confirmation?receipt=${encodeURIComponent(data.receiptToken)}`
+          );
         } catch (err) {
           setError(err instanceof Error ? err.message : t.bookingPage.errorGeneric);
           setLoading(false);
@@ -220,22 +228,23 @@ export default function BookingForm() {
     setError(null);
     setLoading(true);
 
-    const dueDate = addDays(new Date(), 3).toISOString().replace("Z", "-05:00");
-
     try {
       const res = await fetch("/api/charge", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           method,
-          amount: total,
-          description: `Villas Candita - ${roomName} — ${checkIn} to ${checkOut} (${nights} nights)`,
-          dueDate,
           customer: {
             name: guestForm.firstName,
             lastName: guestForm.lastName,
             email: guestForm.email,
             phone: guestForm.phone,
+          },
+          booking: {
+            roomId,
+            checkIn,
+            checkOut,
+            guests,
           },
         }),
       });
@@ -243,7 +252,7 @@ export default function BookingForm() {
       if (!res.ok || data.error) throw new Error(data.error ?? t.bookingPage.errorGeneric);
 
       setPendingOrderId(data.orderId);
-      setPendingDueDate(data.dueDate ?? dueDate);
+      setPendingDueDate(data.dueDate ?? "");
 
       if (method === "bank_account") {
         setSpeiData({
@@ -283,7 +292,7 @@ export default function BookingForm() {
     }
   };
 
-  if (!checkIn || !checkOut || !total) {
+  if (!quote.success) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-stone-50">
         <div className="text-center px-6">
@@ -816,8 +825,14 @@ export default function BookingForm() {
             <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-6 sticky top-6">
               <h3 className="font-serif text-lg text-stone-800 mb-5">{t.bookingPage.summaryTitle}</h3>
 
-              <div className="aspect-video rounded-xl overflow-hidden mb-5 bg-stone-100">
-                <img src="/images/Candita/PATIO3.JPG" alt="Villas Candita" className="w-full h-full object-cover" />
+              <div className="relative aspect-video rounded-xl overflow-hidden mb-5 bg-stone-100">
+                <Image
+                  src="/images/Candita/PATIO3.JPG"
+                  alt="Villas Candita"
+                  fill
+                  sizes="(min-width: 1024px) 33vw, 100vw"
+                  className="object-cover"
+                />
               </div>
 
               <div className="mb-5">

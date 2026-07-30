@@ -1,47 +1,23 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { DateRange, Range, RangeKeyDict } from "react-date-range";
-import { addDays, differenceInDays, format, isBefore, startOfDay } from "date-fns";
+import { addDays, differenceInDays, format, startOfDay } from "date-fns";
 import { useRouter } from "next/navigation";
 import { CalendarDays, Users, ChevronDown, BedDouble } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import {
+  CLEANING_FEE,
+  MIN_NIGHTS,
+  ROOMS,
+  getBlockedDates,
+  rangeIncludesBlockedDate,
+  type RoomId,
+} from "@/lib/booking";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
-const CLEANING_FEE = 800;
-const MIN_NIGHTS = 2;
-
-const ROOMS = [
-  { id: "canario", nameEs: "Habitación Canario", nameEn: "Room Canario", rate: 1500, capacity: 2 },
-  { id: "azul",    nameEs: "Habitación Azul",    nameEn: "Room Azul",    rate: 2400, capacity: 5 },
-  { id: "rosa",    nameEs: "Habitación Rosa",     nameEn: "Room Rosa",    rate: 2600, capacity: 4 },
-] as const;
-
-type RoomId = typeof ROOMS[number]["id"];
-
-const blockedDates: Date[] = [
-  new Date("2026-03-15"),
-  new Date("2026-03-16"),
-  new Date("2026-03-17"),
-  new Date("2026-04-05"),
-  new Date("2026-04-06"),
-];
-
-function isDateBlocked(date: Date): boolean {
-  return blockedDates.some(
-    (blocked) => format(blocked, "yyyy-MM-dd") === format(date, "yyyy-MM-dd")
-  );
-}
-
-function isRangeBlocked(start: Date, end: Date): boolean {
-  let current = new Date(start);
-  while (isBefore(current, end)) {
-    if (isDateBlocked(current)) return true;
-    current = addDays(current, 1);
-  }
-  return false;
-}
+const blockedDates = getBlockedDates();
 
 export default function BookingWidget() {
   const router = useRouter();
@@ -61,27 +37,30 @@ export default function BookingWidget() {
     key: "selection",
   });
 
+  const selectRoom = useCallback((roomId: RoomId) => {
+    const room = ROOMS.find(candidate => candidate.id === roomId);
+    if (!room) return;
+    setSelectedRoomId(roomId);
+    setGuests(current => Math.min(current, room.capacity));
+  }, []);
+
   useEffect(() => {
     const stored = sessionStorage.getItem("selectedRoom") as RoomId | null;
     if (stored && ROOMS.find((r) => r.id === stored)) {
-      setSelectedRoomId(stored);
+      // Browser-only selection restoration is intentionally post-hydration.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      selectRoom(stored);
       sessionStorage.removeItem("selectedRoom");
     }
     const handler = (e: Event) => {
       const roomId = (e as CustomEvent<RoomId>).detail;
       if (ROOMS.find((r) => r.id === roomId)) {
-        setSelectedRoomId(roomId);
-        setGuests((g) => Math.min(g, ROOMS.find((r) => r.id === roomId)!.capacity));
+        selectRoom(roomId);
       }
     };
     window.addEventListener("roomSelected", handler);
     return () => window.removeEventListener("roomSelected", handler);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    setGuests((g) => Math.min(g, selectedRoom.capacity));
-  }, [selectedRoom]);
+  }, [selectRoom]);
 
   const nights =
     dateRange.startDate && dateRange.endDate
@@ -95,7 +74,12 @@ export default function BookingWidget() {
     const selection = item.selection;
     setRangeError(null);
     if (selection.startDate && selection.endDate) {
-      if (isRangeBlocked(selection.startDate, selection.endDate)) {
+      if (
+        rangeIncludesBlockedDate(
+          format(selection.startDate, "yyyy-MM-dd"),
+          format(selection.endDate, "yyyy-MM-dd")
+        )
+      ) {
         setRangeError(t.booking.blockedDatesError);
         return;
       }
@@ -113,14 +97,8 @@ export default function BookingWidget() {
     const params = new URLSearchParams({
       checkIn: format(dateRange.startDate!, "yyyy-MM-dd"),
       checkOut: format(dateRange.endDate!, "yyyy-MM-dd"),
-      nights: nights.toString(),
       guests: guests.toString(),
-      subtotal: subtotal.toString(),
-      cleaningFee: CLEANING_FEE.toString(),
-      total: total.toString(),
       room: selectedRoom.id,
-      roomName: roomName,
-      rate: selectedRoom.rate.toString(),
     });
 
     router.push(`/booking?${params.toString()}`);
@@ -186,7 +164,10 @@ export default function BookingWidget() {
                         return (
                           <button
                             key={room.id}
-                            onClick={() => { setSelectedRoomId(room.id); setShowRoomPicker(false); }}
+                            onClick={() => {
+                              selectRoom(room.id);
+                              setShowRoomPicker(false);
+                            }}
                             className={`w-full flex items-center justify-between px-4 py-3 hover:bg-stone-50 transition-colors text-left ${
                               room.id === selectedRoomId ? "bg-terracotta-50" : ""
                             }`}

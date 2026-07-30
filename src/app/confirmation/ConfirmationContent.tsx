@@ -1,6 +1,5 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import {
@@ -16,19 +15,23 @@ import {
   Lock,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import type { ReceiptPayload } from "@/lib/payment-verification";
 
-export default function ConfirmationContent() {
-  const searchParams = useSearchParams();
+export default function ConfirmationContent({
+  receipt,
+}: {
+  receipt: ReceiptPayload;
+}) {
   const { t, dateLocale } = useLanguage();
 
-  const orderId = searchParams.get("orderId") ?? "VC-000000";
-  const checkIn = searchParams.get("checkIn") ?? "";
-  const checkOut = searchParams.get("checkOut") ?? "";
-  const nights = parseInt(searchParams.get("nights") ?? "0");
-  const guests = parseInt(searchParams.get("guests") ?? "1");
-  const total = parseInt(searchParams.get("total") ?? "0");
-  const guestName = searchParams.get("name") ?? (t.confirmationPage.thanks === "Thank you" ? "Guest" : "Huésped");
-  const guestEmail = searchParams.get("email") ?? "";
+  const orderId = receipt.orderId;
+  const checkIn = receipt.checkIn;
+  const checkOut = receipt.checkOut;
+  const nights = Number.parseInt(receipt.nights, 10);
+  const guests = Number.parseInt(receipt.guests, 10);
+  const total = Number.parseInt(receipt.total, 10);
+  const guestName = receipt.name;
+  const guestEmail = receipt.email;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-stone-50 to-sand-50">
